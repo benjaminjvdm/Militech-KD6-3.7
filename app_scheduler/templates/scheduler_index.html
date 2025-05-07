@@ -28,12 +28,25 @@
             height: 100%;
         }
         h2 {
-            color: #00ffff;
+            /* color: #00ffff; */ /* Remove solid color */
             text-shadow: 0 0 5px #00ffff;
             margin-top: 0;
             margin-bottom: 20px;
             text-align: center;
+            /* Gradient text effect */
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff); /* Pink to Blue gradient */
+            background-size: 200% 100%; /* Make gradient wider than text */
+            -webkit-background-clip: text; /* Clip background to text */
+            -webkit-text-fill-color: transparent; /* Make text transparent */
+            animation: move-gradient 5s linear infinite; /* Animation */
         }
+
+        /* Keyframes for moving gradient */
+        @keyframes move-gradient {
+            0% { background-position: 200% 0; } /* Start gradient off-screen */
+            100% { background-position: -200% 0; } /* Move gradient across text */
+        }
+
         .input-area {
             margin-bottom: 15px;
         }

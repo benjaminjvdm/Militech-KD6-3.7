@@ -29,14 +29,37 @@
         }
         .app-section {
             flex: 1; /* Each section takes equal width */
-            border: 2px solid #ff00ff; /* Neon magenta border */
             margin: 5px; /* Space between sections */
             display: flex;
             flex-direction: column;
             overflow: hidden; /* Hide overflow from iframe */
             background-color: #0f0f23; /* Darker background for sections */
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); /* Section glow */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Section glow (Neon Cyan) */
+            position: relative; /* Needed for pseudo-elements */
+            border: none; /* Remove original border */
+            z-index: 1; /* Ensure content is above pseudo-element */
         }
+
+        /* Animated border pseudo-element */
+        .app-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent; /* Use transparent border on pseudo-element */
+            border-image: conic-gradient(from 0deg, transparent 0%, #ff00ff 20%, #00ffff 40%, #ff00ff 60%, transparent 80%) 1; /* Conic gradient border image */
+            animation: rotate-border 1s linear infinite counterclockwise; /* Animation */
+            z-index: -1; /* Place behind content */
+        }
+
+        /* Keyframes for counterclockwise rotation */
+        @keyframes rotate-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); } /* Counterclockwise rotation */
+        }
+
         .app-section iframe {
             flex-grow: 1; /* Iframe fills the height of its section */
             border: none; /* Remove iframe default border */
