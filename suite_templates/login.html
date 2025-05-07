@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Militech MB000712 - Access Terminal</title>
+    <!-- Link to shared Cyberpunk theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <!-- Tailwind CSS (will be added later via build process or CDN) -->
+    <!-- For now, basic custom CSS will handle styling -->
+    <style>
+        body {
+            background-color: #1a1a2e; /* Deep blue/purple */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace; /* Futuristic font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        .login-container {
+            background-color: #0f0f23; /* Darker background for container */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); /* Neon glow */
+            text-align: center;
+            border: 2px solid #ff00ff; /* Neon magenta border */
+        }
+        h1 {
+            color: #00ffff; /* Neon cyan */
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; /* Text glow */
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ffff; /* Neon cyan */
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a4a; /* Dark input background */
+            border: 1px solid #ff00ff; /* Neon magenta border */
+            color: #00ff00; /* Neon green input text */
+            font-family: 'Share Tech Mono', monospace;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        input[type="text"]:read-only {
+            background-color: #1a1a2e; /* Slightly different background for read-only */
+            border-color: #00ffff; /* Neon cyan border for read-only */
+            color: #ffff00; /* Neon yellow for read-only text */
+        }
+        button {
+            background-color: #ff00ff; /* Neon magenta button */
+            color: #ffffff; /* White text */
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5); /* Button glow */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background-color: #e600e6; /* Darker magenta on hover */
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); /* Increased glow on hover */
+        }
+    </style>
+    <!-- Consider adding a futuristic font like 'Share Tech Mono' from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Access Terminal</h1>
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="{{ themed_username }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Bypass Security // Access Terminal</button>
+        </form>
+    </div>
+</body>
+</html>

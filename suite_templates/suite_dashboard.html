@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Militech MB000712 - Operations Dashboard</title>
+    <!-- Link to shared Cyberpunk theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <!-- Tailwind CSS (will be added later via build process or CDN) -->
+    <!-- For now, basic custom CSS will handle layout -->
+    <style>
+        body {
+            background-color: #1a1a2e; /* Deep blue/purple */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace; /* Futuristic font */
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars on main body */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure full viewport height */
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: row; /* Arrange sections horizontally */
+            flex-grow: 1; /* Allow container to grow and fill height */
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px; /* Add some padding around the sections */
+        }
+        .app-section {
+            flex: 1; /* Each section takes equal width */
+            border: 2px solid #ff00ff; /* Neon magenta border */
+            margin: 5px; /* Space between sections */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Hide overflow from iframe */
+            background-color: #0f0f23; /* Darker background for sections */
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); /* Section glow */
+        }
+        .app-section iframe {
+            flex-grow: 1; /* Iframe fills the height of its section */
+            border: none; /* Remove iframe default border */
+            width: 100%; /* Ensure iframe takes full width of section */
+            height: 100%; /* Ensure iframe takes full height of section */
+        }
+        .error-message {
+            color: #ff0000; /* Red for error */
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Error glow */
+        }
+        /* Consider adding a futuristic font like 'Share Tech Mono' from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Chrono-Scheduler Section -->
+        <div class="app-section">
+            <!--
+                This iframe will load the Chrono-Scheduler application's frontend.
+                The src attribute will point to a Flask route served by the scheduler module.
+                Error handling for iframe loading (e.g., displaying "Relic Error - 333")
+                will likely require JavaScript or server-side rendering logic.
+            -->
+            <iframe src="/scheduler/" title="Chrono-Scheduler"></iframe>
+            <!-- Placeholder for error message if iframe fails to load -->
+            <!-- <div class="error-message" style="display: none;">Relic Error - 333</div> -->
+        </div>
+
+        <!-- Signal Sorter Section -->
+        <div class="app-section">
+             <!--
+                This iframe will load the Signal Sorter application's frontend.
+                The src attribute will point to a Flask route served by the email filter module.
+            -->
+            <iframe src="/email_filter/" title="Signal Sorter"></iframe>
+             <!-- Placeholder for error message if iframe fails to load -->
+            <!-- <div class="error-message" style="display: none;">Relic Error - 333</div> -->
+        </div>
+
+        <!-- DataStream Aggregator Section -->
+        <div class="app-section">
+             <!--
+                This iframe will load the DataStream Aggregator application's frontend.
+                The src attribute will point to a Flask route served by the news aggregator module.
+            -->
+            <iframe src="/news_aggregator/" title="DataStream Aggregator"></iframe>
+             <!-- Placeholder for error message if iframe fails to load -->
+            <!-- <div class="error-message" style="display: none;">Relic Error - 333</div> -->
+        </div>
+    </div>
+</body>
+</html>

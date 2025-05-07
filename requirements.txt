@@ -1,0 +1,11 @@
+Flask==2.3.3 # Or a recent compatible version
+python-dotenv==1.0.0 # Or a recent compatible version
+dateparser==1.2.0 # Or a recent compatible version
+google-api-python-client==2.124.0 # Or a recent compatible version
+google-auth-oauthlib==1.2.0 # Or a recent compatible version
+scikit-learn==1.3.0 # Or a recent compatible version
+feedparser==6.0.10 # Or a recent compatible version
+requests==2.31.0 # Or a recent compatible version
+Flask-APScheduler==1.12.4 # Optional, for background tasks
+nltk==3.8.1 # Optional, for NLP in News Aggregator
+# spaCy # Optional, alternative/additional NLP library (requires separate model download)

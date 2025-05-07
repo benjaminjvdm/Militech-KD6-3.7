@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Sorter</title>
+    <!-- Link to shared Cyberpunk theme CSS -->
+    <!-- Assuming main app serves shared_static at /static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <style>
+        body {
+            background-color: #0f0f23; /* Darker background for the app section */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace;
+            padding: 15px;
+            margin: 0;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            height: 100%; /* Ensure body takes full height of iframe */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        h2 {
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #1a1a2e;
+            border: 1px solid #ff00ff; /* Neon magenta border */
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+        }
+        .section h3 {
+            color: #ffff00; /* Neon yellow for section titles */
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #2a2a4a;
+            border: 1px solid #00ffff; /* Neon cyan border */
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            background-color: #ff00ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background-color: #e600e6;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        }
+        .email-list {
+            flex-grow: 1; /* Allow email list to take remaining height */
+            overflow-y: auto; /* Make email list scrollable */
+            border: 1px solid #00ffff;
+            padding: 10px;
+            background-color: #1a1a2e;
+        }
+        .email-item {
+            border-bottom: 1px dashed #2a2a4a; /* Subtle separator */
+            padding: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .email-item:last-child {
+            border-bottom: none;
+        }
+        .email-item:hover {
+            background-color: #2a2a4a;
+        }
+        .email-item h4 {
+            color: #00ff00; /* Neon green for subject */
+            margin: 0 0 5px 0;
+            font-size: 1em;
+        }
+        .email-item p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #cccccc; /* Lighter color for snippet */
+        }
+        .email-item .category {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #ffff00; /* Neon yellow for category */
+        }
+        .status-monitor {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1a1a2e;
+            border: 1px solid #00ffff;
+            color: #ffff00; /* Neon yellow for status */
+            min-height: 50px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+        .status-monitor p {
+            margin: 5px 0;
+        }
+        .status-success {
+            color: #00ff00; /* Neon green */
+        }
+        .status-error {
+            color: #ff0000; /* Red */
+        }
+    </style>
+</head>
+<body>
+    <div class="filter-container">
+        <h2>Signal Sorter // Transmission Analysis</h2>
+
+        <div class="section email-login">
+            <h3>Authenticate Neural Link</h3>
+            <input type="text" id="emailUsername" placeholder="Email Address">
+            <input type="password" id="emailPassword" placeholder="Password">
+            <button id="connectEmailButton">Connect</button>
+        </div>
+
+        <div class="section filter-matrix">
+            <h3>Filter Matrix // Configuration</h3>
+            <!-- TODO: Add inputs/controls for filter configuration -->
+            <p>Filter configuration options will go here.</p>
+        </div>
+
+        <div class="section incoming-transmissions">
+            <h3>Incoming Transmissions</h3>
+            <div class="email-list" id="emailList">
+                <!-- Email items will be loaded here by JavaScript -->
+                <p>Scanning for transmissions...</p>
+            </div>
+             <button id="fetchEmailsButton">Scan Transmissions</button>
+        </div>
+
+        <div class="status-monitor" id="statusMonitor">
+            <p>System Monitor // Awaiting Commands...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('connectEmailButton').addEventListener('click', function() {
+            const username = document.getElementById('emailUsername').value;
+            const password = document.getElementById('emailPassword').value;
+            const statusMonitor = document.getElementById('statusMonitor');
+
+            statusMonitor.innerHTML = '<p>Establishing neural link...</p>';
+
+            fetch('/email_filter/connect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                statusMonitor.innerHTML = '';
+                const messageElement = document.createElement('p');
+                messageElement.textContent = data.message;
+                if (data.status === 'success') {
+                    messageElement.classList.add('status-success');
+                } else {
+                    messageElement.classList.add('status-error');
+                }
+                statusMonitor.appendChild(messageElement);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                statusMonitor.innerHTML = '';
+                const messageElement = document.createElement('p');
+                messageElement.textContent = 'Relic Error - Connection Failed.';
+                messageElement.classList.add('status-error');
+                statusMonitor.appendChild(messageElement);
+            });
+        });
+
+         document.getElementById('fetchEmailsButton').addEventListener('click', function() {
+            const emailList = document.getElementById('emailList');
+            const statusMonitor = document.getElementById('statusMonitor');
+
+            emailList.innerHTML = '<p>Scanning for transmissions...</p>';
+            statusMonitor.innerHTML = '<p>Engaging filter matrix...</p>';
+
+            fetch('/email_filter/fetch_and_filter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ criteria: "all" }), // TODO: Use actual filter criteria
+            })
+            .then(response => response.json())
+            .then(data => {
+                statusMonitor.innerHTML = '';
+                 const statusMessageElement = document.createElement('p');
+                statusMessageElement.textContent = data.message;
+                 if (data.status === 'success') {
+                    statusMessageElement.classList.add('status-success');
+                } else {
+                    statusMessageElement.classList.add('status-error');
+                }
+                statusMonitor.appendChild(statusMessageElement);
+
+
+                emailList.innerHTML = ''; // Clear scanning message
+                if (data.emails && data.emails.length > 0) {
+                    data.emails.forEach(email => {
+                        const emailItem = document.createElement('div');
+                        emailItem.classList.add('email-item');
+                        emailItem.innerHTML = `
+                            <h4><span class="category">${email.category}</span>${email.subject}</h4>
+                            <p>From: ${email.sender}</p>
+                            <p>${email.snippet}...</p>
+                        `;
+                        emailList.appendChild(emailItem);
+                    });
+                } else {
+                    emailList.innerHTML = '<p>No transmissions found matching criteria.</p>';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                statusMonitor.innerHTML = '';
+                const messageElement = document.createElement('p');
+                messageElement.textContent = 'Relic Error - Transmission Scan Failed.';
+                messageElement.classList.add('status-error');
+                statusMonitor.appendChild(messageElement);
+                 emailList.innerHTML = '<p>Failed to load transmissions.</p>';
+            });
+        });
+    </script>
+</body>
+</html>

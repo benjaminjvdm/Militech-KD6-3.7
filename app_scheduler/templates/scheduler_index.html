@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono-Scheduler</title>
+    <!-- Link to shared Cyberpunk theme CSS -->
+    <!-- Note: The path here is relative to the scheduler_app's static folder,
+         but when embedded in an iframe, it needs to reference the main app's
+         static folder. This might require adjusting the static file serving
+         in main_suite_app.py or using absolute paths iframes.
+         For now, assuming main app serves shared_static at /static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <style>
+        body {
+            background-color: #0f0f23; /* Darker background for the app section */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace;
+            padding: 15px;
+            margin: 0;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            height: 100%; /* Ensure body takes full height of iframe */
+            box-sizing: border-box;
+        }
+        .scheduler-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        h2 {
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .input-area {
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            padding: 10px;
+            background-color: #2a2a4a;
+            border: 1px solid #ff00ff;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff00ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background-color: #e600e6;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        }
+        .message-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1a1a2e;
+            border: 1px solid #00ffff;
+            color: #ffff00; /* Neon yellow for messages */
+            min-height: 50px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .message-area p {
+            margin: 5px 0;
+        }
+        .message-success {
+            color: #00ff00; /* Neon green for success */
+        }
+        .message-error {
+            color: #ff0000; /* Red for error */
+        }
+    </style>
+</head>
+<body>
+    <div class="scheduler-container">
+        <h2>Chrono-Scheduler // Directive Input</h2>
+        <div class="input-area">
+            <input type="text" id="taskInput" placeholder="Enter directive for chrono-sync...">
+            <button id="logTaskButton">Log Task</button>
+        </div>
+        <div class="message-area" id="messageArea">
+            <p>System Monitor // Awaiting Directive...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('logTaskButton').addEventListener('click', function() {
+            const taskInput = document.getElementById('taskInput').value;
+            const messageArea = document.getElementById('messageArea');
+
+            // Clear previous messages
+            messageArea.innerHTML = '';
+            messageArea.innerHTML = '<p>Decrypting transmission...</p>'; // Themed loading message
+
+            fetch('/scheduler/log_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ task_input: taskInput }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageArea.innerHTML = ''; // Clear loading message
+                const messageElement = document.createElement('p');
+                messageElement.textContent = data.message;
+                if (data.status === 'success') {
+                    messageElement.classList.add('message-success');
+                } else {
+                    messageElement.classList.add('message-error');
+                }
+                messageArea.appendChild(messageElement);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                messageArea.innerHTML = ''; // Clear loading message
+                const messageElement = document.createElement('p');
+                messageElement.textContent = 'Relic Error - Transmission Interrupted.';
+                messageElement.classList.add('message-error');
+                messageArea.appendChild(messageElement);
+            });
+        });
+    </script>
+</body>
+</html>

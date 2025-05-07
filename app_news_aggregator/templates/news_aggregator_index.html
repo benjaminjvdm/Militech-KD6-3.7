@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataStream Aggregator</title>
+    <!-- Link to shared Cyberpunk theme CSS -->
+    <!-- Assuming main app serves shared_static at /static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <style>
+        body {
+            background-color: #0f0f23; /* Darker background for the app section */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace;
+            padding: 15px;
+            margin: 0;
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            height: 100%; /* Ensure body takes full height of iframe */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .aggregator-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        h2 {
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #1a1a2e;
+            border: 1px solid #ff00ff; /* Neon magenta border */
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+        }
+        .section h3 {
+            color: #ffff00; /* Neon yellow for section titles */
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+         button {
+            padding: 10px;
+            background-color: #ff00ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background-color: #e600e6;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        }
+        .article-list {
+            flex-grow: 1; /* Allow article list to take remaining height */
+            overflow-y: auto; /* Make article list scrollable */
+            border: 1px solid #00ffff;
+            padding: 10px;
+            background-color: #1a1a2e;
+        }
+        .article-item {
+            border-bottom: 1px dashed #2a2a4a; /* Subtle separator */
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+         .article-item:last-child {
+            border-bottom: none;
+        }
+        .article-item h4 {
+            color: #00ff00; /* Neon green for title */
+            margin: 0 0 5px 0;
+            font-size: 1em;
+        }
+        .article-item .source-date {
+            font-size: 0.8em;
+            color: #cccccc; /* Lighter color for source and date */
+            margin-bottom: 5px;
+        }
+        .article-item p {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            color: #cccccc; /* Lighter color for summary */
+        }
+        .article-item a {
+            color: #ffff00; /* Neon yellow for links */
+            text-decoration: none;
+        }
+        .article-item a:hover {
+            color: #ff00ff; /* Neon magenta on hover */
+        }
+         .status-monitor {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #1a1a2e;
+            border: 1px solid #00ffff;
+            color: #ffff00; /* Neon yellow for status */
+            min-height: 50px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+        .status-monitor p {
+            margin: 5px 0;
+        }
+        .status-success {
+            color: #00ff00; /* Neon green */
+        }
+        .status-error {
+            color: #ff0000; /* Red */
+        }
+    </style>
+</head>
+<body>
+    <div class="aggregator-container">
+        <h2>DataStream Aggregator // Intel Feed</h2>
+
+        <div class="section source-matrix">
+            <h3>Source Matrix // Configuration</h3>
+            <!-- TODO: Add inputs/controls for source configuration (RSS feeds, API keys, keywords) -->
+            <p>Source configuration options will go here.</p>
+        </div>
+
+        <div class="section datastream-view">
+            <h3>DataStream View</h3>
+            <div class="article-list" id="articleList">
+                <!-- Article items will be loaded here by JavaScript -->
+                 <p>Compiling datastream...</p>
+            </div>
+            <button id="fetchNewsButton">Compile Datastream</button>
+        </div>
+
+         <div class="status-monitor" id="statusMonitor">
+            <p>System Monitor // Awaiting Commands...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fetchNewsButton').addEventListener('click', function() {
+            const articleList = document.getElementById('articleList');
+            const statusMonitor = document.getElementById('statusMonitor');
+
+            articleList.innerHTML = '<p>Compiling datastream...</p>';
+            statusMonitor.innerHTML = '<p>Accessing data nodes...</p>';
+
+            // TODO: Get actual sources and keywords from configuration inputs
+            const sources = ["mock_source_1", "mock_source_2"];
+            const keywords = ["cyberware", "netrunner"];
+
+            fetch('/news_aggregator/fetch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sources: sources, keywords: keywords }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                statusMonitor.innerHTML = '';
+                const statusMessageElement = document.createElement('p');
+                statusMessageElement.textContent = data.message;
+                 if (data.status === 'success') {
+                    statusMessageElement.classList.add('status-success');
+                } else {
+                    statusMessageElement.classList.add('status-error');
+                }
+                statusMonitor.appendChild(statusMessageElement);
+
+                articleList.innerHTML = ''; // Clear compiling message
+                if (data.articles && data.articles.length > 0) {
+                    data.articles.forEach(article => {
+                        const articleItem = document.createElement('div');
+                        articleItem.classList.add('article-item');
+                        articleItem.innerHTML = `
+                            <h4>${article.title}</h4>
+                            <div class="source-date">Source: ${article.source} // Date: ${article.date}</div>
+                            <p>${article.summary}...</p>
+                            <a href="${article.link}" target="_blank">Read Full Transmission</a>
+                        `;
+                        articleList.appendChild(articleItem);
+                    });
+                } else {
+                    articleList.innerHTML = '<p>No transmissions found matching criteria.</p>';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                statusMonitor.innerHTML = '';
+                const messageElement = document.createElement('p');
+                messageElement.textContent = 'Relic Error - Datastream Interrupted.';
+                messageElement.classList.add('status-error');
+                statusMonitor.appendChild(messageElement);
+                 articleList.innerHTML = '<p>Failed to compile datastream.</p>';
+            });
+        });
+    </script>
+</body>
+</html>

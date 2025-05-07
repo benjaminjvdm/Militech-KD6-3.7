@@ -1,0 +1,27 @@
+# Ignore environment variables file
+.env
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+
+# Ignore instance folder (if used by Flask for configuration/databases)
+instance/
+
+# Ignore Google OAuth token file
+token.json
+
+# Ignore virtual environment directory (if using venv)
+venv/
+.venv/
+
+# Ignore any downloaded models or large data files
+# models/
+# data/
+
+# Ignore editor-specific files
+.vscode/
+
+# Ignore test results or coverage reports
+# htmlcov/
+# .coverage

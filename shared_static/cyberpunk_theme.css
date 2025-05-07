@@ -1,0 +1,120 @@
+/* cyberpunk_theme.css */
+
+/* Basic Reset and Body Styles */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a2e; /* Deep blue/purple */
+    color: #00ffff; /* Neon cyan */
+    font-family: 'Share Tech Mono', monospace; /* Futuristic font */
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: #00ffff; /* Neon cyan */
+    text-shadow: 0 0 5px #00ffff; /* Text glow */
+    margin-bottom: 15px;
+}
+
+a {
+    color: #ffff00; /* Neon yellow for links */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff00ff; /* Neon magenta on hover */
+}
+
+/* General UI Elements */
+input, button, select, textarea {
+    font-family: 'Share Tech Mono', monospace;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #2a2a4a; /* Dark input background */
+    border: 1px solid #ff00ff; /* Neon magenta border */
+    color: #00ff00; /* Neon green input text */
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #ff00ff; /* Neon magenta button */
+    color: #ffffff; /* White text */
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5); /* Button glow */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background-color: #e600e6; /* Darker magenta on hover */
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); /* Increased glow on hover */
+}
+
+/* Themed Error Message */
+.error-message {
+    color: #ff0000; /* Red for error */
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Error glow */
+}
+
+/* Basic Container/Panel Styling */
+.cyberpunk-panel {
+    background-color: #0f0f23; /* Darker background */
+    border: 2px solid #00ffff; /* Neon cyan border */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4); /* Neon glow */
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+/* Add more specific styles for different components as needed */
+
+/* Example: Glitch effect (can be applied to text or elements) */
+/*
+.glitch {
+    position: relative;
+}
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a2e;
+    overflow: hidden;
+}
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00ff;
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 #00ffff;
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip: rect(10px, 9999px, 20px, 0); }
+    10% { clip: rect(50px, 9999px, 60px, 0); }
+    20% { clip: rect(80px, 9999px, 90px, 0); }
+    ... (add more steps)
+}
+@keyframes glitch-anim-2 {
+     0% { clip: rect(20px, 9999px, 30px, 0); }
+    15% { clip: rect(70px, 9999px, 80px, 0); }
+    25% { clip: rect(100px, 9999px, 110px, 0); }
+    ... (add more steps)
+}
+*/
+
+/* Add font import here or in HTML head */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
