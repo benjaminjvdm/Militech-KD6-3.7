@@ -166,8 +166,8 @@
             statusMonitor.innerHTML = '<p>Accessing data nodes...</p>';
 
             // TODO: Get actual sources and keywords from configuration inputs
-            const sources = ["mock_source_1", "mock_source_2"];
-            const keywords = ["cyberware", "netrunner"];
+            const sources = []; // NewsAPI 'everything' endpoint doesn't filter by source in this way
+            const keywords = ["transhumanism"];
 
             fetch('/news_aggregator/fetch', {
                 method: 'POST',
