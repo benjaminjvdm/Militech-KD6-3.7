@@ -136,6 +136,43 @@ def fetch_and_filter_emails(criteria):
     except Exception as e:
         return {"status": "error", "message": f"Email Processing Error: {e}"}
 
+def delete_email_by_id(email_id_to_delete):
+    """Deletes an email by its ID."""
+    print(f"Attempting to delete email with ID: {email_id_to_delete}")
+    connection_result = connect_to_email()
+
+    if connection_result["status"] == "error":
+        return connection_result
+
+    mail = connection_result["mail_object"]
+
+    try:
+        mail.select('inbox')
+        # Mark the email for deletion
+        result, data = mail.store(email_id_to_delete.encode(), '+FLAGS', '\\Deleted')
+        if result == 'OK':
+            # Expunge to permanently delete
+            expunge_result, expunge_data = mail.expunge()
+            if expunge_result == 'OK':
+                # Check if any emails were expunged. expunge_data will list IDs of expunged emails.
+                # If expunge_data is [None] or empty for some servers, it means no messages were expunged (e.g., ID not found or already deleted)
+                # A successful deletion of a specific ID would typically result in that ID (or a list containing it) being in expunge_data.
+                # However, the response can vary. A simple "OK" from expunge is often sufficient.
+                print(f"Expunge result: {expunge_result}, Data: {expunge_data}")
+                mail.logout()
+                return {"status": "success", "message": f"Email ID {email_id_to_delete} marked for deletion and expunged."}
+            else:
+                mail.logout()
+                return {"status": "error", "message": f"Failed to expunge email ID {email_id_to_delete}. Server response: {expunge_result}"}
+        else:
+            mail.logout()
+            return {"status": "error", "message": f"Failed to mark email ID {email_id_to_delete} for deletion. Server response: {result}"}
+    except Exception as e:
+        # Ensure logout even if an error occurs
+        if 'mail' in locals() and mail and mail.state == 'SELECTED':
+            mail.logout()
+        return {"status": "error", "message": f"Error deleting email: {e}"}
+
 
 # --- Routes ---
 @email_filter_bp.route('/')
@@ -166,6 +203,21 @@ def fetch_filter():
     """
     criteria = request.get_json()
     result = fetch_and_filter_emails(criteria)
+    return jsonify(result)
+
+@email_filter_bp.route('/delete_email', methods=['POST'])
+def delete_email_route():
+    """
+    Handles request to delete a specific email.
+    Expects JSON payload with 'email_id'.
+    """
+    data = request.get_json()
+    email_id = data.get('email_id')
+
+    if not email_id:
+        return jsonify({"status": "error", "message": "Email ID not provided."}), 400
+
+    result = delete_email_by_id(email_id)
     return jsonify(result)
 
 # This __main__ block is removed as the module will be run via the main app.

@@ -85,6 +85,18 @@
             background-color: #e600e6;
             box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
         }
+        button.delete-btn {
+            background-color: #ff3333; /* Reddish color for delete */
+            color: #ffffff;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-left: 10px; /* Space it from other content */
+            box-shadow: 0 0 8px rgba(255, 51, 51, 0.5);
+        }
+        button.delete-btn:hover {
+            background-color: #cc0000;
+            box-shadow: 0 0 12px rgba(255, 51, 51, 0.8);
+        }
         .email-list {
             flex-grow: 1; /* Allow email list to take remaining height */
             overflow-y: auto; /* Make email list scrollable */
@@ -95,8 +107,14 @@
         .email-item {
             border-bottom: 1px dashed #2a2a4a; /* Subtle separator */
             padding: 10px 0;
-            cursor: pointer;
+            /* cursor: pointer; */ /* Remove if delete button is primary action */
             transition: background-color 0.2s ease;
+            display: flex; /* For aligning delete button */
+            justify-content: space-between; /* Push delete button to the right */
+            align-items: center; /* Vertically align items */
+        }
+        .email-item-content {
+            flex-grow: 1; /* Allow content to take available space */
         }
         .email-item:last-child {
             border-bottom: none;
@@ -203,10 +221,17 @@
                      data.emails.forEach(email => {
                          const emailItem = document.createElement('div');
                          emailItem.classList.add('email-item');
+                         
+                         // Sanitize email.id to be safe for use in HTML attributes if needed, though here it's passed to a function
+                         const safeEmailId = String(email.id).replace(/"/g, '"');
+ 
                          emailItem.innerHTML = `
-                             <h4><span class="category">${email.category}</span>${email.subject}</h4>
-                             <p>From: ${email.sender}</p>
-                             <p>${email.snippet}...</p>
+                             <div class="email-item-content">
+                                 <h4><span class="category">${email.category}</span>${email.subject}</h4>
+                                 <p>From: ${email.sender}</p>
+                                 <p>${email.snippet}...</p>
+                             </div>
+                             <button class="delete-btn" onclick="deleteEmail('${safeEmailId}')">Delete</button>
                          `;
                          emailList.appendChild(emailItem);
                      });
@@ -223,10 +248,46 @@
                  statusMonitor.appendChild(messageElement);
                   emailList.innerHTML = '<p>Failed to load transmissions.</p>';
              });
-         }
- 
-         document.getElementById('connectEmailButton').addEventListener('click', function() {
-             const statusMonitor = document.getElementById('statusMonitor');
+     }
+
+     // Function to delete an email
+     function deleteEmail(emailId) {
+         const statusMonitor = document.getElementById('statusMonitor');
+         statusMonitor.innerHTML = `<p>Initiating deletion protocol for transmission ID: ${emailId}...</p>`;
+
+         fetch('/email_filter/delete_email', {
+             method: 'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+             },
+             body: JSON.stringify({ email_id: emailId }),
+         })
+         .then(response => response.json())
+         .then(data => {
+             statusMonitor.innerHTML = ''; // Clear previous message
+             const messageElement = document.createElement('p');
+             messageElement.textContent = data.message;
+             if (data.status === 'success') {
+                 messageElement.classList.add('status-success');
+                 // Refresh the email list to show the change
+                 fetchAndDisplayEmails();
+             } else {
+                 messageElement.classList.add('status-error');
+             }
+             statusMonitor.appendChild(messageElement);
+         })
+         .catch(error => {
+             console.error('Error deleting email:', error);
+             statusMonitor.innerHTML = '';
+             const messageElement = document.createElement('p');
+             messageElement.textContent = `Relic Error - Failed to delete transmission ID: ${emailId}.`;
+             messageElement.classList.add('status-error');
+             statusMonitor.appendChild(messageElement);
+         });
+     }
+
+     document.getElementById('connectEmailButton').addEventListener('click', function() {
+         const statusMonitor = document.getElementById('statusMonitor');
  
              statusMonitor.innerHTML = '<p>Establishing neural link...</p>';
  
