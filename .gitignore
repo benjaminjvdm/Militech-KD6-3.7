@@ -22,6 +22,8 @@ venv/
 # Ignore editor-specific files
 .vscode/
 
+README.md
+
 # Ignore test results or coverage reports
 # htmlcov/
 # .coverage
