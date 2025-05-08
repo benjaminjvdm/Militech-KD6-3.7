@@ -118,3 +118,30 @@ button:hover {
 
 /* Add font import here or in HTML head */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+/* Custom Scrollbar for Webkit Browsers */
+::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a2e; /* Background of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00ffff; /* Color of the scrollbar thumb (the draggable part) */
+    border-radius: 5px; /* Rounded corners for the thumb */
+    border: 2px solid #0f0f23; /* Border around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00e6e6; /* Slightly darker cyan on hover */
+}
+
+/* Optional: Style for Firefox (less control) */
+/*
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #00ffff #1a1a2e;
+}
+*/
