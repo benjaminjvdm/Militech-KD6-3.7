@@ -147,9 +147,7 @@
 
         <div class="section email-login">
             <h3>Authenticate Neural Link</h3>
-            <input type="text" id="emailUsername" placeholder="Email Address">
-            <input type="password" id="emailPassword" placeholder="Password">
-            <button id="connectEmailButton">Connect</button>
+            <button id="connectEmailButton">Authenticate Neural Link</button>
         </div>
 
         <div class="section filter-matrix">
@@ -164,104 +162,108 @@
                 <!-- Email items will be loaded here by JavaScript -->
                 <p>Scanning for transmissions...</p>
             </div>
-             <button id="fetchEmailsButton">Scan Transmissions</button>
-        </div>
-
-        <div class="status-monitor" id="statusMonitor">
-            <p>System Monitor // Awaiting Commands...</p>
-        </div>
-    </div>
-
-    <script>
-        document.getElementById('connectEmailButton').addEventListener('click', function() {
-            const username = document.getElementById('emailUsername').value;
-            const password = document.getElementById('emailPassword').value;
-            const statusMonitor = document.getElementById('statusMonitor');
-
-            statusMonitor.innerHTML = '<p>Establishing neural link...</p>';
-
-            fetch('/email_filter/connect', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: username, password: password }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                statusMonitor.innerHTML = '';
-                const messageElement = document.createElement('p');
-                messageElement.textContent = data.message;
-                if (data.status === 'success') {
-                    messageElement.classList.add('status-success');
-                } else {
-                    messageElement.classList.add('status-error');
-                }
-                statusMonitor.appendChild(messageElement);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                statusMonitor.innerHTML = '';
-                const messageElement = document.createElement('p');
-                messageElement.textContent = 'Relic Error - Connection Failed.';
-                messageElement.classList.add('status-error');
-                statusMonitor.appendChild(messageElement);
-            });
-        });
-
-         document.getElementById('fetchEmailsButton').addEventListener('click', function() {
-            const emailList = document.getElementById('emailList');
-            const statusMonitor = document.getElementById('statusMonitor');
-
-            emailList.innerHTML = '<p>Scanning for transmissions...</p>';
-            statusMonitor.innerHTML = '<p>Engaging filter matrix...</p>';
-
-            fetch('/email_filter/fetch_and_filter', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ criteria: "all" }), // TODO: Use actual filter criteria
-            })
-            .then(response => response.json())
-            .then(data => {
-                statusMonitor.innerHTML = '';
-                 const statusMessageElement = document.createElement('p');
-                statusMessageElement.textContent = data.message;
+         </div>
+ 
+         <div class="status-monitor" id="statusMonitor">
+             <p>System Monitor // Awaiting Commands...</p>
+         </div>
+     </div>
+ 
+     <script>
+         // Function to fetch and display emails
+         function fetchAndDisplayEmails() {
+             const emailList = document.getElementById('emailList');
+             const statusMonitor = document.getElementById('statusMonitor');
+ 
+             emailList.innerHTML = '<p>Scanning for transmissions...</p>';
+             statusMonitor.innerHTML = '<p>Engaging filter matrix...</p>';
+ 
+             fetch('/email_filter/fetch_and_filter', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({ criteria: "all" }), // TODO: Use actual filter criteria
+             })
+             .then(response => response.json())
+             .then(data => {
+                 statusMonitor.innerHTML = '';
+                  const statusMessageElement = document.createElement('p');
+                 statusMessageElement.textContent = data.message;
+                  if (data.status === 'success') {
+                     statusMessageElement.classList.add('status-success');
+                 } else {
+                     statusMessageElement.classList.add('status-error');
+                 }
+                 statusMonitor.appendChild(statusMessageElement);
+ 
+ 
+                 emailList.innerHTML = ''; // Clear scanning message
+                 if (data.emails && data.emails.length > 0) {
+                     data.emails.forEach(email => {
+                         const emailItem = document.createElement('div');
+                         emailItem.classList.add('email-item');
+                         emailItem.innerHTML = `
+                             <h4><span class="category">${email.category}</span>${email.subject}</h4>
+                             <p>From: ${email.sender}</p>
+                             <p>${email.snippet}...</p>
+                         `;
+                         emailList.appendChild(emailItem);
+                     });
+                 } else {
+                     emailList.innerHTML = '<p>No transmissions found matching criteria.</p>';
+                 }
+             })
+             .catch((error) => {
+                 console.error('Error:', error);
+                 statusMonitor.innerHTML = '';
+                 const messageElement = document.createElement('p');
+                 messageElement.textContent = 'Relic Error - Transmission Scan Failed.';
+                 messageElement.classList.add('status-error');
+                 statusMonitor.appendChild(messageElement);
+                  emailList.innerHTML = '<p>Failed to load transmissions.</p>';
+             });
+         }
+ 
+         document.getElementById('connectEmailButton').addEventListener('click', function() {
+             const statusMonitor = document.getElementById('statusMonitor');
+ 
+             statusMonitor.innerHTML = '<p>Establishing neural link...</p>';
+ 
+             fetch('/email_filter/connect', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({}), // No credentials needed in body
+             })
+             .then(response => response.json())
+             .then(data => {
+                 statusMonitor.innerHTML = '';
+                 const messageElement = document.createElement('p');
+                 messageElement.textContent = data.message;
                  if (data.status === 'success') {
-                    statusMessageElement.classList.add('status-success');
-                } else {
-                    statusMessageElement.classList.add('status-error');
-                }
-                statusMonitor.appendChild(statusMessageElement);
-
-
-                emailList.innerHTML = ''; // Clear scanning message
-                if (data.emails && data.emails.length > 0) {
-                    data.emails.forEach(email => {
-                        const emailItem = document.createElement('div');
-                        emailItem.classList.add('email-item');
-                        emailItem.innerHTML = `
-                            <h4><span class="category">${email.category}</span>${email.subject}</h4>
-                            <p>From: ${email.sender}</p>
-                            <p>${email.snippet}...</p>
-                        `;
-                        emailList.appendChild(emailItem);
-                    });
-                } else {
-                    emailList.innerHTML = '<p>No transmissions found matching criteria.</p>';
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                statusMonitor.innerHTML = '';
-                const messageElement = document.createElement('p');
-                messageElement.textContent = 'Relic Error - Transmission Scan Failed.';
-                messageElement.classList.add('status-error');
-                statusMonitor.appendChild(messageElement);
-                 emailList.innerHTML = '<p>Failed to load transmissions.</p>';
-            });
-        });
-    </script>
-</body>
-</html>
+                     messageElement.classList.add('status-success');
+                     // If connection is successful, automatically fetch emails
+                     fetchAndDisplayEmails();
+                 } else {
+                     messageElement.classList.add('status-error');
+                 }
+                 statusMonitor.appendChild(messageElement);
+             })
+             .catch((error) => {
+                 console.error('Error:', error);
+                 statusMonitor.innerHTML = '';
+                 const messageElement = document.createElement('p');
+                 messageElement.textContent = 'Relic Error - Connection Failed.';
+                 messageElement.classList.add('status-error');
+                 statusMonitor.appendChild(messageElement);
+             });
+         });
+ 
+         // Initial state: Clear email list and show scanning message
+         document.getElementById('emailList').innerHTML = '<p>Awaiting neural link authentication...</p>';
+ 
+     </script>
+ </body>
+ </html>
