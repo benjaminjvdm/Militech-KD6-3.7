@@ -97,10 +97,45 @@
             color: #ff0000; /* Red for error */
         }
     </style>
+    <style>
+        /* World Clock Styles */
+        .world-clock-area {
+            margin-top: 20px; /* Added margin to the top */
+            margin-bottom: 20px;
+            padding: 15px;
+            /* Inherits cyberpunk-panel styles */
+        }
+
+        .world-clock-area h3 {
+            color: #ffff00; /* Neon yellow for the heading */
+            text-shadow: 0 0 5px #ffff00; /* Yellow glow */
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .clocks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            gap: 10px; /* Space between clocks */
+        }
+
+        .clock {
+            background-color: #2a2a4a; /* Dark background */
+            border: 1px solid #00ff00; /* Neon green border */
+            color: #00ffff; /* Neon cyan text */
+            padding: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.3); /* Green glow */
+        }
+    </style>
 </head>
 <body>
     <div class="scheduler-container">
-        <h2>Chrono-Scheduler // Directive Input</h2>
+        <h2>Chrono-Scheduler // Chrono-Sync</h2>
+
+        <h2>Directive Input</h2>
         <div class="input-area">
             <input type="text" id="taskInput" placeholder="Enter directive for chrono-sync...">
             <button id="logTaskButton">Log Task</button>
@@ -108,9 +143,48 @@
         <div class="message-area" id="messageArea">
             <p>System Monitor // Awaiting Directive...</p>
         </div>
+
+        <div class="world-clock-area cyberpunk-panel">
+            <h3>Global Chronometers</h3>
+            <div class="clocks-container">
+                <div class="clock" id="clock-ny">New York: Loading...</div>
+                <div class="clock" id="clock-th">Thailand: Loading...</div>
+                <div class="clock" id="clock-seoul">Seoul: Loading...</div>
+                <div class="clock" id="clock-sa">South Africa: Loading...</div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // World Clock Script
+        function updateClocks() {
+            const now = new Date();
+
+            // New York (Eastern Time - assuming EST/EDT)
+            const nyTime = now.toLocaleString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('clock-ny').textContent = `New York: ${nyTime}`;
+
+            // Thailand (Indochina Time)
+            const thTime = now.toLocaleString('en-US', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('clock-th').textContent = `Thailand: ${thTime}`;
+
+            // Seoul (Korea Standard Time)
+            const seoulTime = now.toLocaleString('en-US', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('clock-seoul').textContent = `Seoul: ${seoulTime}`;
+
+            // South Africa (South African Standard Time)
+            const saTime = now.toLocaleString('en-US', { timeZone: 'Africa/Johannesburg', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('clock-sa').textContent = `South Africa: ${saTime}`;
+        }
+
+        // Update clocks every second
+        setInterval(updateClocks, 1000);
+
+        // Initial update
+        updateClocks();
+
+
+        // Existing Task Logging Script
         document.getElementById('logTaskButton').addEventListener('click', function() {
             const taskInput = document.getElementById('taskInput').value;
             const messageArea = document.getElementById('messageArea');
