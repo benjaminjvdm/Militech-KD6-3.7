@@ -32,7 +32,7 @@ def login():
     POST: Processes the login form.
     """
     # Pre-fill username for thematic purposes
-    themed_username = "Militech-MB000712"
+    themed_username = "Militech-KD6-3.7"
 
     if request.method == 'POST':
         password = request.form.get('password') # Assuming the password input field is named 'password'
