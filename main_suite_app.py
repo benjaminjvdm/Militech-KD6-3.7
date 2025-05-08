@@ -29,8 +29,11 @@ def login():
     """
     Handles the login page.
     GET: Displays the login form.
-    POST: Processes the login form. Any password is accepted for this themed login.
+    POST: Processes the login form.
     """
+    # Pre-fill username for thematic purposes
+    themed_username = "Militech-MB000712"
+
     if request.method == 'POST':
         password = request.form.get('password') # Assuming the password input field is named 'password'
 
@@ -39,13 +42,13 @@ def login():
             return redirect(url_for('dashboard')) # Redirect to the current suite dashboard
         elif password == 'cash':
             print("Login successful for 'cash'")
-            return redirect(url_for('cash_dashboard'))
+            return redirect(url_for('cash_dashboard')) # Redirect to the cash suite dashboard
         else:
             # Handle invalid password - re-render login with an error message
             print("Invalid password")
             return render_template('login.html', themed_username=themed_username, error="Invalid password")
-    # Pre-fill username for thematic purposes
-    themed_username = "Militech-MB000712"
+
+    # Handle GET request: Display the login form
     return render_template('login.html', themed_username=themed_username)
 
 @app.route('/dashboard')
