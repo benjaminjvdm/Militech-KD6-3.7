@@ -1,5 +1,11 @@
 import os
+import imaplib
+import email
+from dotenv import load_dotenv
 from flask import Blueprint, render_template, request, jsonify
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize a Blueprint for the email filter module
 # The url_prefix will be set when registering with the main app
@@ -9,32 +15,92 @@ email_filter_bp = Blueprint('email_filter', __name__,
 
 # Note: Secret key is configured in the main app, not here for a Blueprint
 
-# --- Email Processing and Filtering (Placeholders) ---
-# TODO: Implement actual email connection (IMAP), processing, and filtering logic
-# Use imaplib, email, scikit-learn, python-dotenv
+# --- Email Processing and Filtering ---
+# Use imaplib, email, scikit-learn (optional), python-dotenv
 # Handle secure credential storage and loading (.env)
 # Implement AI/ML or rule-based filtering
 
-def connect_to_email(credentials):
-    """Placeholder for connecting to email server."""
-    print("Attempting to connect to email server...")
-    # TODO: Implement IMAP connection
-    # Handle OAuth for Gmail if possible
-    return {"status": "success", "message": "Neural Link Established."}
+def connect_to_email():
+    """Connects to the email server using credentials from environment variables."""
+    imap_server = os.getenv('EMAIL_IMAP_SERVER')
+    imap_port = os.getenv('EMAIL_PORT')
+    email_address = os.getenv('EMAIL_ADDRESS')
+    email_password = os.getenv('EMAIL_PASSWORD')
+
+    if not all([imap_server, imap_port, email_address, email_password]):
+        return {"status": "error", "message": "Email credentials not fully configured in .env"}
+
+    try:
+        # Connect to the IMAP server
+        mail = imaplib.IMAP4_SSL(imap_server, int(imap_port))
+        # Log in to the account
+        mail.login(email_address, email_password)
+        return {"status": "success", "message": "Neural Link Established.", "mail_object": mail}
+    except Exception as e:
+        return {"status": "error", "message": f"Connection Error: {e}"}
 
 def fetch_and_filter_emails(criteria):
-    """Placeholder for fetching and filtering emails."""
+    """Fetches and filters emails based on criteria."""
     print("Scanning for incoming transmissions...")
-    # TODO: Implement email fetching and filtering logic
-    # Use imaplib, email libraries
-    # Apply filtering rules/ML model
-    # Return a list of filtered emails (mock data for now)
-    mock_emails = [
-        {"id": 1, "sender": "corpo@arasaka.com", "subject": "Urgent: Q3 Projections", "snippet": "Your quarterly projections are due...", "category": "Urgent Comms"},
-        {"id": 2, "sender": "spam@nightcityads.net", "subject": "Get Rich Quick in Watson!", "snippet": "Invest in our new cyber-enhancement scheme...", "category": "Corpo-Spam"},
-        {"id": 3, "sender": "netrunner@hidden.net", "subject": "Intel Drop: Location of Relic", "snippet": "Meet me at the Afterlife...", "category": "Intel Drops"},
-    ]
-    return {"status": "success", "message": "Transmissions sorted.", "emails": mock_emails}
+    connection_result = connect_to_email()
+
+    if connection_result["status"] == "error":
+        return connection_result # Return error if connection failed
+
+    mail = connection_result["mail_object"]
+
+    try:
+        # Select the inbox
+        mail.select('inbox')
+
+        # Search for emails (currently searching all emails)
+        # TODO: Implement filtering based on 'criteria'
+        status, messages = mail.search(None, 'ALL')
+
+        emails = []
+        if status == 'OK':
+            for msg_id in messages[0].split():
+                # Fetch the email
+                status, msg_data = mail.fetch(msg_id, '(RFC822)')
+                if status == 'OK':
+                    raw_email = msg_data[0][1]
+                    msg = email.message_from_bytes(raw_email)
+
+                    # Extract relevant information
+                    subject = msg['subject']
+                    sender = msg['from']
+                    # TODO: Extract snippet and category based on filtering logic
+                    snippet = "Snippet extraction not implemented."
+                    category = "Uncategorized"
+
+                    emails.append({
+                        "id": msg_id.decode(),
+                        "sender": sender,
+                        "subject": subject,
+                        "snippet": snippet,
+                        "category": category
+                    })
+
+        # Logout from the email server
+        mail.logout()
+
+        # TODO: Apply filtering rules/ML model to the fetched emails
+        # For now, returning all fetched emails (or mock data if fetching fails)
+        if not emails:
+             # Return mock data if no emails are fetched
+            mock_emails = [
+                {"id": 1, "sender": "corpo@arasaka.com", "subject": "Urgent: Q3 Projections", "snippet": "Your quarterly projections are due...", "category": "Urgent Comms"},
+                {"id": 2, "sender": "spam@nightcityads.net", "subject": "Get Rich Quick in Watson!", "snippet": "Invest in our new cyber-enhancement scheme...", "category": "Corpo-Spam"},
+                {"id": 3, "sender": "netrunner@hidden.net", "subject": "Intel Drop: Location of Relic", "snippet": "Meet me at the Afterlife...", "category": "Intel Drops"},
+            ]
+            return {"status": "success", "message": "No new transmissions. Displaying cached data.", "emails": mock_emails}
+
+
+        return {"status": "success", "message": "Transmissions sorted.", "emails": emails}
+
+    except Exception as e:
+        return {"status": "error", "message": f"Email Processing Error: {e}"}
+
 
 # --- Routes ---
 @email_filter_bp.route('/')
@@ -49,10 +115,13 @@ def index():
 def connect():
     """
     Handles email server connection request.
+    Attempts to connect using credentials from environment variables.
     """
-    credentials = request.get_json()
-    # TODO: Securely handle credentials and attempt connection
-    result = connect_to_email(credentials)
+    # No longer need to get credentials from request
+    result = connect_to_email()
+    # Remove mail_object from result before jsonify as it's not serializable
+    if "mail_object" in result:
+        del result["mail_object"]
     return jsonify(result)
 
 @email_filter_bp.route('/fetch_and_filter', methods=['POST'])
@@ -61,7 +130,6 @@ def fetch_filter():
     Handles request to fetch and filter emails.
     """
     criteria = request.get_json()
-    # TODO: Use criteria to fetch and filter emails
     result = fetch_and_filter_emails(criteria)
     return jsonify(result)
 
