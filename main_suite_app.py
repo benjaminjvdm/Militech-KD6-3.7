@@ -32,10 +32,18 @@ def login():
     POST: Processes the login form. Any password is accepted for this themed login.
     """
     if request.method == 'POST':
-        # In this themed login, any password is considered valid
-        # For a real application, you would verify the password here
-        print("Login successful (themed)")
-        return redirect(url_for('dashboard'))
+        password = request.form.get('password') # Assuming the password input field is named 'password'
+
+        if password == 'mon':
+            print("Login successful for 'mon'")
+            return redirect(url_for('dashboard')) # Redirect to the current suite dashboard
+        elif password == 'cash':
+            print("Login successful for 'cash'")
+            return redirect(url_for('cash_dashboard'))
+        else:
+            # Handle invalid password - re-render login with an error message
+            print("Invalid password")
+            return render_template('login.html', themed_username=themed_username, error="Invalid password")
     # Pre-fill username for thematic purposes
     themed_username = "Militech-MB000712"
     return render_template('login.html', themed_username=themed_username)
@@ -47,6 +55,14 @@ def dashboard():
     """
     # In a real application, you might add authentication checks here
     return render_template('suite_dashboard.html')
+
+@app.route('/cash_dashboard')
+def cash_dashboard():
+    """
+    Renders the cash suite dashboard page with placeholders.
+    """
+    # In a real application, you might add authentication checks here
+    return render_template('cash_dashboard.html')
 
 @app.route('/')
 def index():

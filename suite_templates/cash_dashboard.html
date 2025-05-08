@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Suite Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cyberpunk_theme.css') }}">
+    <style>
+        body {
+            background-color: #1a1a2e; /* Deep blue/purple */
+            color: #00ffff; /* Neon cyan */
+            font-family: 'Share Tech Mono', monospace; /* Futuristic font */
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars on main body */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure full viewport height */
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: row; /* Arrange sections horizontally */
+            flex-grow: 1; /* Allow container to grow and fill height */
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px; /* Add some padding around the sections */
+        }
+        .placeholder {
+            flex: 1; /* Each placeholder takes equal width */
+            margin: 5px; /* Space between placeholders */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
+            background-color: #0f0f23; /* Darker background for placeholders */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Placeholder glow (Neon Cyan) */
+            position: relative; /* Needed for pseudo-elements */
+            border: none; /* Remove original border */
+            z-index: 1; /* Ensure content is above pseudo-element */
+            color: #ff00ff; /* Neon magenta for placeholder text */
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Animated border pseudo-element */
+        .placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent; /* Use transparent border on pseudo-element */
+            border-image: conic-gradient(from 0deg, transparent 0%, #ff00ff 20%, #00ffff 40%, #ff00ff 60%, transparent 80%) 1; /* Conic gradient border image */
+            animation: rotate-border 1s linear infinite counterclockwise; /* Animation */
+            z-index: -1; /* Place behind content */
+        }
+
+        /* Keyframes for counterclockwise rotation */
+        @keyframes rotate-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); } /* Counterclockwise rotation */
+        }
+
+        /* Consider adding a futuristic font like 'Share Tech Mono' from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="placeholder">Placeholder 1</div>
+        <div class="placeholder">Placeholder 2</div>
+        <div class="placeholder">Placeholder 3</div>
+    </div>
+</body>
+</html>
