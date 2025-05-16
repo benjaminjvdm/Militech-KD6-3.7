@@ -7,6 +7,8 @@ from app_scheduler.scheduler_app import scheduler_bp
 from app_email_filter.email_filter_app import email_filter_bp
 # Import the news aggregator module blueprint
 from app_news_aggregator.news_aggregator_app import news_aggregator_bp
+# Import the finance charts module
+from app_finance.finance_charts import generate_dashboard_charts
 
 # Initialize Flask app
 app = Flask(__name__,
@@ -62,10 +64,11 @@ def dashboard():
 @app.route('/cash_dashboard')
 def cash_dashboard():
     """
-    Renders the cash suite dashboard page with placeholders.
+    Renders the cash suite dashboard page with financial charts.
     """
     # In a real application, you might add authentication checks here
-    return render_template('cash_dashboard.html')
+    charts_data = generate_dashboard_charts()
+    return render_template('cash_dashboard.html', charts=charts_data)
 
 @app.route('/')
 def index():

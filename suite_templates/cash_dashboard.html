@@ -17,32 +17,42 @@
             min-height: 100vh; /* Ensure full viewport height */
         }
         .dashboard-container {
-            display: flex;
-            flex-direction: row; /* Arrange sections horizontally */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            grid-template-rows: repeat(2, 1fr); /* 2 rows */
+            gap: 10px; /* Space between grid items */
             flex-grow: 1; /* Allow container to grow and fill height */
             width: 100%;
             box-sizing: border-box;
-            padding: 10px; /* Add some padding around the sections */
+            padding: 10px; /* Add some padding around the grid */
         }
-        .placeholder {
-            flex: 1; /* Each placeholder takes equal width */
-            margin: 5px; /* Space between placeholders */
+        .chart-container {
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center content vertically */
             align-items: center; /* Center content horizontally */
-            background-color: #0f0f23; /* Darker background for placeholders */
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Placeholder glow (Neon Cyan) */
+            background-color: #0f0f23; /* Darker background for containers */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Container glow (Neon Cyan) */
             position: relative; /* Needed for pseudo-elements */
             border: none; /* Remove original border */
             z-index: 1; /* Ensure content is above pseudo-element */
-            color: #ff00ff; /* Neon magenta for placeholder text */
-            font-size: 1.5em;
-            font-weight: bold;
+            color: #00ffff; /* Neon cyan for text */
+            padding: 10px; /* Add padding inside the container */
+            overflow: hidden; /* Hide parts of the image that exceed the container */
+        }
+        .chart-container h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #ff00ff; /* Neon magenta for titles */
+        }
+        .chart-container img {
+            width: 100%; /* Make image fill the container width */
+            height: auto;
+            max-height: 100%; /* Ensure image scales down to fit container height */
+            display: block; /* Remove extra space below image */
         }
 
         /* Animated border pseudo-element */
-        .placeholder::before {
+        .chart-container::before {
             content: '';
             position: absolute;
             top: 0;
@@ -67,9 +77,14 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <div class="placeholder">Placeholder 1</div>
-        <div class="placeholder">Placeholder 2</div>
-        <div class="placeholder">Placeholder 3</div>
+        {% for symbol, img_data in charts.items() %}
+            {% if img_data %}
+                <div class="chart-container">
+                    <h2>{{ symbol }}</h2>
+                    <img src="data:image/png;base64,{{ img_data }}" alt="{{ symbol }} Chart">
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </body>
 </html>
