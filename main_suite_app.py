@@ -8,7 +8,7 @@ from app_email_filter.email_filter_app import email_filter_bp
 # Import the news aggregator module blueprint
 from app_news_aggregator.news_aggregator_app import news_aggregator_bp
 # Import the finance charts module
-from app_finance.finance_charts import generate_dashboard_chart
+from app_finance.finance_charts import generate_dashboard_chart, generate_15min_chart, generate_1hour_chart
 import base64
 import io
 
@@ -69,15 +69,20 @@ def cash_dashboard():
     Renders the cash suite dashboard page with financial charts.
     """
     # In a real application, you might add authentication checks here
-    chart_image_bytes = generate_dashboard_chart('GBPJPY=X') # Generate chart image bytes for GBPJPY=X
-    print(f"Chart image data type: {type(chart_image_bytes)}")
-    print(f"Chart image data (first 100 chars): {str(chart_image_bytes)[:100]}")
-    
+    chart_5min_bytes = generate_dashboard_chart('GBPJPY=X') # Generate 5-minute chart image bytes
+    chart_15min_bytes = generate_15min_chart('GBPJPY=X') # Generate 15-minute chart image bytes
+    chart_1hour_bytes = generate_1hour_chart('GBPJPY=X') # Generate 1-hour chart image bytes
+
     # Convert image bytes to base64 for embedding in HTML
-    img_base64 = base64.b64encode(chart_image_bytes).decode('ascii')
-    print(f"Base64 image data length: {len(img_base64)}")
-    
-    charts_data = {'GBPJPY=X': img_base64} # Pass base64 encoded image data as a dictionary
+    img_5min_base64 = base64.b64encode(chart_5min_bytes).decode('ascii')
+    img_15min_base64 = base64.b64encode(chart_15min_bytes).decode('ascii')
+    img_1hour_base64 = base64.b64encode(chart_1hour_bytes).decode('ascii')
+
+    charts_data = {
+        'GBPJPY=X_5min': img_5min_base64,
+        'GBPJPY=X_15min': img_15min_base64,
+        'GBPJPY=X_1hour': img_1hour_base64
+    }
     
     return render_template('cash_dashboard.html', charts=charts_data)
 
