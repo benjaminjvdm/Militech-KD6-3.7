@@ -1,0 +1,446 @@
+pyharmonics.plotter package
+Submodules
+pyharmonics.plotter.harmonic module
+
+Created on Mon Nov 1 17:02:46 2021
+
+@author: xual
+
+class pyharmonics.plotter.harmonic.HarmonicPlotter(technicals: OHLCTechnicals, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting harmonic patterns.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized purely for pyharmonics.
+
+class pyharmonics.plotter.harmonic.Plotter(technicals: OHLCTechnicals, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting other trends.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized purely for general trends.
+
+class pyharmonics.plotter.harmonic.PlotterBase(technicals: OHLCTechnicals, title=None, time_horizon=None, row_map=None, colors=None, plot_ema=False, plot_sma=True, ignore_weekend=False)[source]
+
+    Bases: ABC
+
+    Base class for plotting harmonic patterns and divergences.
+
+    add_divergence_plots(divergences)[source]
+
+        Add divergence patterns to the plot.
+
+d = DivergenceSearch(technicals)
+
+d.search()
+
+    p.add_divergence_plots(d.get_patterns())
+
+    Parameters:
+
+        divergences – The divergence patterns to add.
+
+add_harmonic_pattern(p)[source]
+
+    Add a single harmonic pattern to the plot. THis provides compatability with the HarmonicSearch object.
+
+hs = HarminicSearch(techanicals)
+
+hs.search()
+
+    p.add_harmonic_plots(hs.get_patterns()[hs.XABCD][0])
+
+add_harmonic_plots(pattern_data)[source]
+
+    Add harmonic patterns to the plot.
+
+hs = HarminicSearch(techanicals)
+
+hs.search()
+
+        p.add_harmonic_plots(hs.get_patterns())
+
+        Parameters:
+
+            pattern_data – The harmonic pattern data.
+
+    add_indicator_plot(ind)[source]
+
+        Add an indicator plot to the main plot.
+
+    add_macd_plot()[source]
+
+        Add the MACD plot to the main plot.
+
+    add_peaks()[source]
+
+        Add peaks to the plot. Will place dots on each peak detected.
+
+    add_volume_plot()[source]
+
+        Add the volume plot to the main plot.
+
+    remove_date_gaps()[source]
+
+        Remove blank space for weekends or holidays. This makes a plot more readable.
+
+    save_plot_image(location, dpi=600)[source]
+
+        Save the plot to an image. Useful for people wanting to publish trends.
+
+        Parameters:
+
+                location – The location to save the image.
+
+                dpi – The dots per inch for the image.
+
+    set_main_plot()[source]
+
+        Set the main plot.
+
+    show()[source]
+
+        Show the plot.
+
+    to_image(dpi=600)[source]
+
+        Return the plot as an image. Useful for HTTP API calls. Useful for integration with AI.
+
+        Parameters:
+
+            dpi – The dots per inch for the image.
+
+class pyharmonics.plotter.harmonic.PositionPlotter(technicals, position, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting positions. Position plotting is more complex than harmonic plotting. Position plotting requires plotting the position outcomes. Position plotting requires plotting the position targets.
+
+    pad_right(final_candle, num_candles=120)[source]
+
+        Pad the right side of the plot with empty candles. This is useful for plotting the future.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized for trading positions.
+
+pyharmonics.plotter.option module
+
+class pyharmonics.plotter.option.OptionPlotter(yo, expiry)[source]
+
+    Bases: object
+
+    A class to plot option data.
+
+    plot_losses(row, col)[source]
+
+        Plot the losses for the options. This is the balance of losses for the market maker as the price moves away from the strike price.
+
+    p.plot_losses(2, 1)
+
+    Parameters:
+
+            row (int) – The row to plot the losses.
+
+            col (int) – The column to plot the losses.
+
+plot_pain(row, col)[source]
+
+    Plot the forward looking pain for the options. This refers to the increasing losses the writer of the options will incur as the price moves away from the strike price. This happens when the writer of the option will have to buy or sell the underlying asset at a loss to cover the options at expiry.
+
+    This often results in the price of the underlying asset moving towards the option strike price as the expiry date approaches.
+
+    p.plot_pain(1, 2)
+
+    Parameters:
+
+            row (int) – The row to plot the pain.
+
+            col (int) – The column to plot the pain.
+
+plot_price(price, label, against, row, col, height=0.8)[source]
+
+    Plot the price for the options.
+
+    p.plot_price(price, label, against, 1, 1)
+
+    Parameters:
+
+            price (float) – The price to plot.
+
+            label (str) – The label for the price.
+
+            against (str) – The trend to plot against.
+
+            row (int) – The row to plot the price.
+
+            col (int) – The column to plot the price.
+
+            height (float) – The height of the price line.
+
+plot_trend(trend, row, col)[source]
+
+    Plot the trend for the options.
+
+    p.plot_trend('volume', 1, 1)
+
+    Parameters:
+
+            trend (str) – The trend to plot.
+
+            row (int) – The row to plot the trend.
+
+            col (int) – The column to plot the trend.
+
+save_plot_image(location, dpi=600)[source]
+
+    Save the plot image. This is useful for people who want to post the image on social media or a website.
+
+    p.save_plot_image('option_plot.png')
+
+    Parameters:
+
+            location (str) – The location to save the image.
+
+            dpi (int) – The resolution of the image.
+
+set_main_plot()[source]
+
+    Set the main plot for the option data.
+
+show()[source]
+
+    Show.
+
+to_image(dpi=600)[source]
+
+    Convert the plot to an image. This is useful for people who want to send the image over a HTTP request. The image is returned as a base64 encoded string.
+
+p.to_image()
+
+        p.to_image(dpi=300)
+
+        Parameters:
+
+            dpi (int) – The resolution of the image.
+
+class pyharmonics.plotter.option.OptionSurface(yo)[source]
+
+    Bases: object
+
+    A class to plot option data as a surface plot. this is a 3D plot.
+
+    save_plot_image(location, dpi=600)[source]
+
+        Save the plot image. This is useful for people who want to post the image on social media or a website.”
+
+p.save_plot_image('option_plot.png')
+
+    p.save_plot_image('option_plot.png', dpi=300)
+
+    Parameters:
+
+            location (str) – The location to save the image.
+
+            dpi (int) – The resolution of the image.
+
+set_main_plot()[source]
+
+    Set the main plot for the option data.
+
+show()[source]
+
+    Show
+
+to_image(dpi=600)[source]
+
+    Convert the plot to an image. This is useful for people who want to send the image over a HTTP request. The image is returned as a base64 encoded string.
+
+p.to_image()
+
+        p.to_image(dpi=300)
+
+        Parameters:
+
+            dpi (int) – The resolution of the image.
+
+Module contents
+
+class pyharmonics.plotter.HarmonicPlotter(technicals: OHLCTechnicals, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting harmonic patterns.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized purely for pyharmonics.
+
+class pyharmonics.plotter.OptionPlotter(yo, expiry)[source]
+
+    Bases: object
+
+    A class to plot option data.
+
+    plot_losses(row, col)[source]
+
+        Plot the losses for the options. This is the balance of losses for the market maker as the price moves away from the strike price.
+
+    p.plot_losses(2, 1)
+
+    Parameters:
+
+            row (int) – The row to plot the losses.
+
+            col (int) – The column to plot the losses.
+
+plot_pain(row, col)[source]
+
+    Plot the forward looking pain for the options. This refers to the increasing losses the writer of the options will incur as the price moves away from the strike price. This happens when the writer of the option will have to buy or sell the underlying asset at a loss to cover the options at expiry.
+
+    This often results in the price of the underlying asset moving towards the option strike price as the expiry date approaches.
+
+    p.plot_pain(1, 2)
+
+    Parameters:
+
+            row (int) – The row to plot the pain.
+
+            col (int) – The column to plot the pain.
+
+plot_price(price, label, against, row, col, height=0.8)[source]
+
+    Plot the price for the options.
+
+    p.plot_price(price, label, against, 1, 1)
+
+    Parameters:
+
+            price (float) – The price to plot.
+
+            label (str) – The label for the price.
+
+            against (str) – The trend to plot against.
+
+            row (int) – The row to plot the price.
+
+            col (int) – The column to plot the price.
+
+            height (float) – The height of the price line.
+
+plot_trend(trend, row, col)[source]
+
+    Plot the trend for the options.
+
+    p.plot_trend('volume', 1, 1)
+
+    Parameters:
+
+            trend (str) – The trend to plot.
+
+            row (int) – The row to plot the trend.
+
+            col (int) – The column to plot the trend.
+
+save_plot_image(location, dpi=600)[source]
+
+    Save the plot image. This is useful for people who want to post the image on social media or a website.
+
+    p.save_plot_image('option_plot.png')
+
+    Parameters:
+
+            location (str) – The location to save the image.
+
+            dpi (int) – The resolution of the image.
+
+set_main_plot()[source]
+
+    Set the main plot for the option data.
+
+show()[source]
+
+    Show.
+
+to_image(dpi=600)[source]
+
+    Convert the plot to an image. This is useful for people who want to send the image over a HTTP request. The image is returned as a base64 encoded string.
+
+p.to_image()
+
+        p.to_image(dpi=300)
+
+        Parameters:
+
+            dpi (int) – The resolution of the image.
+
+class pyharmonics.plotter.OptionSurface(yo)[source]
+
+    Bases: object
+
+    A class to plot option data as a surface plot. this is a 3D plot.
+
+    save_plot_image(location, dpi=600)[source]
+
+        Save the plot image. This is useful for people who want to post the image on social media or a website.”
+
+p.save_plot_image('option_plot.png')
+
+    p.save_plot_image('option_plot.png', dpi=300)
+
+    Parameters:
+
+            location (str) – The location to save the image.
+
+            dpi (int) – The resolution of the image.
+
+set_main_plot()[source]
+
+    Set the main plot for the option data.
+
+show()[source]
+
+    Show
+
+to_image(dpi=600)[source]
+
+    Convert the plot to an image. This is useful for people who want to send the image over a HTTP request. The image is returned as a base64 encoded string.
+
+p.to_image()
+
+        p.to_image(dpi=300)
+
+        Parameters:
+
+            dpi (int) – The resolution of the image.
+
+class pyharmonics.plotter.Plotter(technicals: OHLCTechnicals, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting other trends.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized purely for general trends.
+
+class pyharmonics.plotter.PositionPlotter(technicals, position, row_map=None, colors=None, plot_ema=False, plot_sma=True)[source]
+
+    Bases: PlotterBase
+
+    An extension of the PlotterBase class for plotting positions. Position plotting is more complex than harmonic plotting. Position plotting requires plotting the position outcomes. Position plotting requires plotting the position targets.
+
+    pad_right(final_candle, num_candles=120)[source]
+
+        Pad the right side of the plot with empty candles. This is useful for plotting the future.
+
+    set_sub_plots()[source]
+
+        Set the sub plots for the main plot. The measurements for subplots are optimized for trading positions.
+

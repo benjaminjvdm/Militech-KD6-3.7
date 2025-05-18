@@ -8,7 +8,9 @@ from app_email_filter.email_filter_app import email_filter_bp
 # Import the news aggregator module blueprint
 from app_news_aggregator.news_aggregator_app import news_aggregator_bp
 # Import the finance charts module
-from app_finance.finance_charts import generate_dashboard_charts
+from app_finance.finance_charts import generate_dashboard_chart
+import base64
+import io
 
 # Initialize Flask app
 app = Flask(__name__,
@@ -67,7 +69,16 @@ def cash_dashboard():
     Renders the cash suite dashboard page with financial charts.
     """
     # In a real application, you might add authentication checks here
-    charts_data = generate_dashboard_charts()
+    chart_image_bytes = generate_dashboard_chart('GBPJPY=X') # Generate chart image bytes for GBPJPY=X
+    print(f"Chart image data type: {type(chart_image_bytes)}")
+    print(f"Chart image data (first 100 chars): {str(chart_image_bytes)[:100]}")
+    
+    # Convert image bytes to base64 for embedding in HTML
+    img_base64 = base64.b64encode(chart_image_bytes).decode('ascii')
+    print(f"Base64 image data length: {len(img_base64)}")
+    
+    charts_data = {'GBPJPY=X': img_base64} # Pass base64 encoded image data as a dictionary
+    
     return render_template('cash_dashboard.html', charts=charts_data)
 
 @app.route('/')
@@ -80,4 +91,4 @@ def index():
 if __name__ == '__main__':
     # Run the Flask development server
     # In production, use a production-ready WSGI server like Gunicorn or uWSGI
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
