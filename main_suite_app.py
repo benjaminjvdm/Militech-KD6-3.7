@@ -11,6 +11,7 @@ from app_news_aggregator.news_aggregator_app import news_aggregator_bp
 from app_finance.finance_charts import generate_dashboard_chart, generate_15min_chart, generate_1hour_chart
 import base64
 import io
+from flask_apscheduler import APScheduler
 
 # Initialize Flask app
 app = Flask(__name__,
@@ -27,6 +28,27 @@ app.register_blueprint(scheduler_bp, url_prefix='/scheduler')
 app.register_blueprint(email_filter_bp, url_prefix='/email_filter')
 # Register the news aggregator module blueprint
 app.register_blueprint(news_aggregator_bp, url_prefix='/news_aggregator')
+
+# Initialize scheduler
+scheduler = APScheduler()
+chart_data_cache = {}
+
+def update_charts():
+    """Generates and caches the latest financial charts."""
+    print("Updating charts...")
+    chart_5min_bytes = generate_dashboard_chart('GBPJPY=X')
+    chart_15min_bytes = generate_15min_chart('GBPJPY=X')
+    chart_1hour_bytes = generate_1hour_chart('GBPJPY=X')
+
+    chart_data_cache['GBPJPY=X_5min'] = base64.b64encode(chart_5min_bytes).decode('ascii')
+    chart_data_cache['GBPJPY=X_15min'] = base64.b64encode(chart_15min_bytes).decode('ascii')
+    chart_data_cache['GBPJPY=X_1hour'] = base64.b64encode(chart_1hour_bytes).decode('ascii')
+    print("Charts updated and cached.")
+
+# Schedule the chart update job
+# Run the update_charts function every 5 minutes
+scheduler.add_job(id='update_finance_charts', func=update_charts, trigger='interval', minutes=5)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,22 +91,15 @@ def cash_dashboard():
     Renders the cash suite dashboard page with financial charts.
     """
     # In a real application, you might add authentication checks here
-    chart_5min_bytes = generate_dashboard_chart('GBPJPY=X') # Generate 5-minute chart image bytes
-    chart_15min_bytes = generate_15min_chart('GBPJPY=X') # Generate 15-minute chart image bytes
-    chart_1hour_bytes = generate_1hour_chart('GBPJPY=X') # Generate 1-hour chart image bytes
+    # Use cached chart data
+    return render_template('cash_dashboard.html', charts=chart_data_cache)
 
-    # Convert image bytes to base64 for embedding in HTML
-    img_5min_base64 = base64.b64encode(chart_5min_bytes).decode('ascii')
-    img_15min_base64 = base64.b64encode(chart_15min_bytes).decode('ascii')
-    img_1hour_base64 = base64.b64encode(chart_1hour_bytes).decode('ascii')
-
-    charts_data = {
-        'GBPJPY=X_5min': img_5min_base64,
-        'GBPJPY=X_15min': img_15min_base64,
-        'GBPJPY=X_1hour': img_1hour_base64
-    }
-    
-    return render_template('cash_dashboard.html', charts=charts_data)
+@app.route('/get_charts')
+def get_charts():
+    """
+    Returns the latest cached chart data as JSON.
+    """
+    return chart_data_cache
 
 @app.route('/')
 def index():
@@ -94,6 +109,13 @@ def index():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
+    # Initialize and start the scheduler
+    scheduler.init_app(app)
+    scheduler.start()
+
+    # Perform initial chart update to populate the cache
+    update_charts()
+
     # Run the Flask development server
     # In production, use a production-ready WSGI server like Gunicorn or uWSGI
     app.run(debug=True, port=5001)

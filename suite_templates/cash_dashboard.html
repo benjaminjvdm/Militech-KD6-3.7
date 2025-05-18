@@ -86,5 +86,27 @@
             {% endif %}
         {% endfor %}
     </div>
+    </div>
+    <script>
+        function fetchCharts() {
+            fetch('/get_charts')
+                .then(response => response.json())
+                .then(charts => {
+                    for (const [symbol, img_data] of Object.entries(charts)) {
+                        const imgElement = document.querySelector(`img[alt="${symbol} Chart"]`);
+                        if (imgElement) {
+                            imgElement.src = `data:image/png;base64,${img_data}`;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching charts:', error));
+        }
+
+        // Fetch charts initially when the page loads
+        fetchCharts();
+
+        // Fetch charts every 5 minutes (300000 milliseconds)
+        setInterval(fetchCharts, 300000);
+    </script>
 </body>
 </html>
